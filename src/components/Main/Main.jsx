@@ -1,7 +1,8 @@
 import style from './Main.module.css'
 import Card from "../Card/Card"
 import { posts } from '../../data/posts'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 
 const initialFormData = {
     id: '',
@@ -12,7 +13,10 @@ const initialFormData = {
     published: true
 }
 
+export const API_BASE_URI = 'http://localhost:3000/'
+
 export default function Main() {
+
     const [publishedPosts, setPublishedPosts] = useState(posts.filter((post) => post.published === true))
     const [formData, setFormData] = useState(initialFormData)
 
@@ -25,6 +29,18 @@ export default function Main() {
             [key]: value,
         });
     }
+
+    function fetchPosts() {
+        axios.get(`${API_BASE_URI}posts`)
+        .then(res => {
+            console.log('post res', res);
+            setPublishedPosts(res.data)
+        })
+    }
+
+    useEffect(() => {
+        fetchPosts()
+    },[])
 
     function addPost(event) {
         event.preventDefault()
@@ -107,7 +123,7 @@ export default function Main() {
                                 title={post.title}
                                 content={post.content}
                                 tags={post.tags}
-                                image={post.image}
+                                image={`http://localhost:3000/imgs/posts/${post.image}`}
                                 onDelete={() => deletePost(post.id)} />
                         </div>
                     ))}
